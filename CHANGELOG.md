@@ -1,0 +1,5 @@
+# Revision history for haskii
+
+## 0.1.0.0 -- 2024-08-29
+
+* First version. Released on an unsuspecting world.
