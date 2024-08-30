@@ -13,4 +13,5 @@ executable haskii
                      , bytestring
                      , JuicyPixels
                      , optparse-applicative
+                     , terminal-size
   default-language:    Haskell2010

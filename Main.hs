@@ -5,11 +5,13 @@ module Main where
 import Codec.Picture
 import qualified Data.ByteString as BS
 import Data.Char (chr)
+import Data.Maybe (fromMaybe)
 import Options.Applicative
+import System.Console.Terminal.Size
 import System.IO (hPutStrLn, stderr)
 
 data Options = Options
-  { inputFile :: FilePath, scale :: Double }
+  { inputFile :: FilePath, scale :: Maybe Double }
 
 options :: Parser Options
 options = Options
@@ -17,11 +19,10 @@ options = Options
           <> metavar "FILE"
           <> help "Input image file"
       )
-    <*> option auto ( long "scale"
+    <*> optional (option auto ( long "scale"
           <> metavar "SCALE"
           <> help "Scale factor for the output (e.g., 0.5 for half size)"
-          <> value 1.0
-      )
+      ))
 
 asciiChars :: String
 asciiChars = " .:-=+*#%@"
@@ -78,7 +79,16 @@ main = do
     Right img -> do
       let grayImg = convertToGrayscale img
           (w, h) = (imageWidth grayImg, imageHeight grayImg)
-          newWidth = round (fromIntegral w * scale opts)
-          newHeight = round (fromIntegral h * scale opts * 0.4) -- since ascii characters are taller than they are wide
+      
+      termSize <- size
+      let defaultScale = case termSize of
+            Nothing -> 1.0
+            Just (Window th tw) ->
+              min (0.8 * fromIntegral tw / fromIntegral w)
+                  (0.8 * fromIntegral th / (fromIntegral h * 0.4))
+          scaleFactor = fromMaybe defaultScale (scale opts)
+          newWidth = round (fromIntegral w * scaleFactor)
+          newHeight = round (fromIntegral h * scaleFactor * 0.4) -- since ASCII characters are taller than they are wide
           scaledImg = scaleBilinear newWidth newHeight grayImg
+
       putStrLn $ imageToAscii scaledImg

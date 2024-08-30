@@ -36,3 +36,7 @@ pretty self-explanatory, really. produces ascii art from images. and it's writte
               .*++*###*#****####******               
               .****#################*-
 ```
+
+<br>
+
+inspiration: [asciigen by seatedro](https://github.com/seatedro/asciigen)
